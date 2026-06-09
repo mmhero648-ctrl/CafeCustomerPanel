@@ -1,13 +1,15 @@
 'use client'
 
-import { Search, ShoppingBag, User } from 'lucide-react'
+import { Search, ShoppingBag, User, Menu } from 'lucide-react'
 import { useStore } from '@/lib/store'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 export function TopNav() {
   const { state, navigate, cartCount } = useStore()
   const [bounce, setBounce] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const prev = useRef(cartCount)
 
   useEffect(() => {
@@ -47,13 +49,32 @@ export function TopNav() {
         )}
 
         <nav className="flex items-center gap-1">
-          <button
+          <div className="relative">
+            <button
+              aria-label="منو"
+              className="grid size-9 place-items-center text-green-foreground/80 transition-colors hover:text-gold-muted"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              <Menu className="size-[18px]" strokeWidth={1.6} />
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-1 w-48 rounded-lg border border-gold/20 bg-parchment shadow-lg">
+                <div className="py-2">
+                  <Link href="/customer/orders" className="block px-4 py-2 text-sm text-ink hover:bg-gold/10">سفارش‌های من</Link>
+                  <Link href="/customer/favorites" className="block px-4 py-2 text-sm text-ink hover:bg-gold/10">علاقه‌مندی‌ها</Link>
+                  <Link href="/customer/loyalty" className="block px-4 py-2 text-sm text-ink hover:bg-gold/10">باشگاه</Link>
+                  <Link href="/customer/notifications" className="block px-4 py-2 text-sm text-ink hover:bg-gold/10">اطلاع‌رسانی‌ها</Link>
+                </div>
+              </div>
+            )}
+          </div>
+          <Link
+            href="/customer/search"
             aria-label="جستجو"
             className="grid size-9 place-items-center text-green-foreground/80 transition-colors hover:text-gold-muted"
-            onClick={() => navigate('menu')}
           >
             <Search className="size-[18px]" strokeWidth={1.6} />
-          </button>
+          </Link>
           <button
             aria-label="سفارش"
             onClick={() => navigate('cart')}

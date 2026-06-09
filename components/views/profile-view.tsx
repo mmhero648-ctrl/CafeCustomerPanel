@@ -5,13 +5,14 @@ import { useStore } from '@/lib/store'
 import { Price, Stamp, SectionRule } from '@/components/typeset'
 import { WALLET_TX, CAMPAIGNS, type PastOrder } from '@/lib/data'
 
-type Tab = 'overview' | 'orders' | 'wallet' | 'rewards'
+type Tab = 'overview' | 'orders' | 'wallet' | 'rewards' | 'settings'
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'overview', label: 'نمای کلی' },
   { key: 'orders', label: 'سفارش‌ها' },
   { key: 'wallet', label: 'کیف پول' },
   { key: 'rewards', label: 'باشگاه' },
+  { key: 'settings', label: 'تنظیمات' },
 ]
 
 const MODE_LABEL: Record<string, string> = {
@@ -68,6 +69,7 @@ export function ProfileView() {
         {tab === 'orders' && <OrdersTab orders={state.pastOrders} />}
         {tab === 'wallet' && <WalletTab />}
         {tab === 'rewards' && <RewardsTab />}
+        {tab === 'settings' && <SettingsTab />}
       </div>
     </div>
   )
@@ -361,6 +363,80 @@ function RewardsTab() {
           ))}
         </ul>
       </div>
+    </div>
+  )
+}
+
+function SettingsTab() {
+  const { navigate, state } = useStore()
+  const { customer } = state
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* My Info */}
+      <div className="paper-card px-6 py-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-display text-lg text-ink">اطلاعات شخصی</p>
+            <p className="mt-1 text-sm text-ink-soft">
+              نام: {customer.name} · تلفن: {customer.phone || '—'}
+            </p>
+          </div>
+          <button className="text-green transition-colors hover:text-green/80">
+            ویرایش
+          </button>
+        </div>
+      </div>
+
+      {/* Preferences */}
+      <div className="paper-card px-6 py-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-display text-lg text-ink">ترجیحات</p>
+            <p className="mt-1 text-sm text-ink-soft">
+              محدودیت‌های غذایی و زبان
+            </p>
+          </div>
+          <button className="text-green transition-colors hover:text-green/80">
+            تنظیم
+          </button>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      <div className="paper-card px-6 py-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-display text-lg text-ink">اطلاع‌رسانی‌ها</p>
+            <p className="mt-1 text-sm text-ink-soft">
+              تنبیه و اطلاعات سفارش
+            </p>
+          </div>
+          <button className="text-green transition-colors hover:text-green/80">
+            تنظیم
+          </button>
+        </div>
+      </div>
+
+      {/* Privacy & Security */}
+      <div className="paper-card px-6 py-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-display text-lg text-ink">حریم‌خصوصی</p>
+            <p className="mt-1 text-sm text-ink-soft">
+              دسترسی و کنترل داده
+            </p>
+          </div>
+          <button className="text-green transition-colors hover:text-green/80">
+            مشاهده
+          </button>
+        </div>
+      </div>
+
+      {/* Logout */}
+      <button className="mt-4 w-full border border-burgundy/60 px-6 py-3 text-sm text-burgundy transition-colors hover:bg-burgundy/5">
+        خروج از حساب
+      </button>
     </div>
   )
 }

@@ -13,23 +13,64 @@ type Question = {
   options: string[]
 }
 
-const QUESTIONS: Question[] = [
-  {
-    id: 'coffee',
-    prose: 'قهوهٔ امروز چطور بود؟',
-    options: ['دقیقاً همان‌طور که دوست دارم', 'خوب بود، اما جای بهتر شدن داشت', 'این بار به دلم ننشست'],
-  },
-  {
-    id: 'service',
-    prose: 'و سرعت آماده‌سازی و پذیرایی؟',
-    options: ['سریع‌تر از انتظارم', 'به‌اندازهٔ معمول', 'کمی بیش از حد طول کشید'],
-  },
-  {
-    id: 'return',
-    prose: 'دوباره به ما سر می‌زنید؟',
-    options: ['حتماً، اینجا را دوست دارم', 'شاید گاهی', 'مطمئن نیستم'],
-  },
-]
+function getQuestionsForMode(mode: 'table' | 'takeaway' | 'delivery'): Question[] {
+  if (mode === 'table') {
+    return [
+      {
+        id: 'coffee',
+        prose: 'قهوهٔ امروز چطور بود؟',
+        options: ['دقیقاً همان‌طور که دوست دارم', 'خوب بود، اما جای بهتر شدن داشت', 'این بار به دلم ننشست'],
+      },
+      {
+        id: 'ambiance',
+        prose: 'فضای کافه امروز چطور بود؟',
+        options: ['آرام و دنج', 'خیلی پر و شلوغ', 'ایده‌آل بود'],
+      },
+      {
+        id: 'return',
+        prose: 'دوباره به ما سر می‌زنید؟',
+        options: ['حتماً، اینجا را دوست دارم', 'شاید گاهی', 'مطمئن نیستم'],
+      },
+    ]
+  } else if (mode === 'takeaway') {
+    return [
+      {
+        id: 'coffee',
+        prose: 'قهوهٔ امروز چطور بود؟',
+        options: ['دقیقاً همان‌طور که دوست دارم', 'خوب بود، اما جای بهتر شدن داشت', 'این بار به دلم ننشست'],
+      },
+      {
+        id: 'packaging',
+        prose: 'کیفیت بسته‌بندی چطور بود؟',
+        options: ['عالی و مناسب', 'کافی بود', 'نیاز به بهتری داشت'],
+      },
+      {
+        id: 'speed',
+        prose: 'سرعت سرویس چطور بود؟',
+        options: ['سریع‌تر از انتظارم', 'به‌اندازهٔ معمول', 'کمی بیش از حد طول کشید'],
+      },
+    ]
+  } else {
+    // delivery
+    return [
+      {
+        id: 'delivery_time',
+        prose: 'زمان تحویل چطور بود؟',
+        options: ['سریع‌تر از انتظارم', 'به‌اندازهٔ معمول', 'کمی تاخیر داشت'],
+      },
+      {
+        id: 'packaging',
+        prose: 'کیفیت و بسته‌بندی محصول؟',
+        options: ['عالی و ایمن', 'کافی بود', 'نیاز به بهتری داشت'],
+      },
+      {
+        id: 'courier',
+        prose: 'رفتار پیک‌تان چطور بود؟',
+        options: ['دوست‌داشتنی و حرفه‌ای', 'خوب بود', 'نیاز به بهتری داشت'],
+      },
+    ]
+  }
+}
 
 export function SurveySheet() {
   const { state, closeSurvey, completeSurvey } = useStore()
@@ -39,6 +80,9 @@ export function SurveySheet() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [comment, setComment] = useState('')
   const [done, setDone] = useState(false)
+
+  const mode = state.activeOrder?.mode ?? 'table'
+  const QUESTIONS = getQuestionsForMode(mode)
 
   // Reset the card whenever it is (re)opened
   useEffect(() => {

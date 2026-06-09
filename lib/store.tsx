@@ -65,6 +65,7 @@ type State = {
   pastOrders: PastOrder[]
   surveyOpen: boolean
   surveyDone: boolean
+  surveyContext: string | null
 }
 
 const STAGES: Record<OrderMode, Omit<TrackStage, 'time'>[]> = {
@@ -102,18 +103,18 @@ type Action =
   | { type: 'LOGIN'; phone: string }
   | { type: 'PLACE_ORDER'; order: ActiveOrder }
   | { type: 'ADVANCE_STAGE' }
-  | { type: 'OPEN_SURVEY' }
+  | { type: 'OPEN_SURVEY'; orderNumber?: string }
   | { type: 'CLOSE_SURVEY' }
   | { type: 'COMPLETE_SURVEY'; points: number }
 
 const initialCustomer: Customer = {
   name: 'سارا',
-  phone: '',
+  phone: '09123456789',
   tier: 'Silver',
   tierFa: 'نقره‌ای',
   points: 1240,
   wallet: 69000,
-  loggedIn: false,
+  loggedIn: true,
 }
 
 const initialState: State = {
@@ -130,6 +131,7 @@ const initialState: State = {
   pastOrders: PAST_ORDERS,
   surveyOpen: false,
   surveyDone: false,
+  surveyContext: null,
 }
 
 function reducer(state: State, action: Action): State {
@@ -197,7 +199,11 @@ function reducer(state: State, action: Action): State {
       }
     }
     case 'OPEN_SURVEY':
-      return { ...state, surveyOpen: true }
+      return { 
+        ...state, 
+        surveyOpen: true,
+        surveyContext: action.orderNumber ?? state.activeOrder?.number ?? null,
+      }
     case 'CLOSE_SURVEY':
       return { ...state, surveyOpen: false }
     case 'COMPLETE_SURVEY':

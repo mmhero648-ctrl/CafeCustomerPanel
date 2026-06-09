@@ -16,6 +16,9 @@ import {
 } from './data'
 import { uid, genOrderNumber, nowTime } from './format'
 
+export type Portal = 'customer' | 'admin' | 'cashier' | 'kds' | 'driver'
+export type UserRole = 'customer' | 'admin' | 'cashier' | 'kds_operator' | 'driver'
+
 export type View =
   | 'landing'
   | 'menu'
@@ -52,6 +55,13 @@ export type ActiveOrder = {
 }
 
 type State = {
+  // Authentication
+  currentPortal: Portal | null
+  currentRole: UserRole | null
+  isAuthenticated: boolean
+  authToken: string | null
+  
+  // Customer Portal State
   view: View
   direction: 'left' | 'right'
   mode: OrderMode | null
@@ -90,6 +100,11 @@ const STAGES: Record<OrderMode, Omit<TrackStage, 'time'>[]> = {
 }
 
 type Action =
+  // Auth Actions
+  | { type: 'PORTAL_LOGIN'; portal: Portal; role: UserRole; token: string }
+  | { type: 'PORTAL_LOGOUT' }
+  | { type: 'SELECT_PORTAL'; portal: Portal }
+  // Customer Portal Actions
   | { type: 'NAVIGATE'; view: View; direction?: 'left' | 'right' }
   | { type: 'SET_MODE'; mode: OrderMode; table?: string }
   | { type: 'ADD_LINE'; line: CartLine }
@@ -118,6 +133,13 @@ const initialCustomer: Customer = {
 }
 
 const initialState: State = {
+  // Auth
+  currentPortal: null,
+  currentRole: null,
+  isAuthenticated: false,
+  authToken: null,
+  
+  // Customer Portal
   view: 'landing',
   direction: 'left',
   mode: null,
@@ -136,6 +158,24 @@ const initialState: State = {
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case 'PORTAL_LOGIN':
+      return {
+        ...state,
+        currentPortal: action.portal,
+        currentRole: action.role,
+        isAuthenticated: true,
+        authToken: action.token,
+      }
+    case 'PORTAL_LOGOUT':
+      return {
+        ...state,
+        currentPortal: null,
+        currentRole: null,
+        isAuthenticated: false,
+        authToken: null,
+      }
+    case 'SELECT_PORTAL':
+      return { ...state, currentPortal: action.portal }
     case 'NAVIGATE':
       return { ...state, view: action.view, direction: action.direction ?? 'left' }
     case 'SET_MODE':
@@ -222,6 +262,11 @@ function reducer(state: State, action: Action): State {
 
 type StoreCtx = {
   state: State
+  // Auth methods
+  portalLogin: (portal: Portal, role: UserRole, token: string) => void
+  portalLogout: () => void
+  selectPortal: (portal: Portal) => void
+  // Customer Portal methods
   navigate: (view: View, direction?: 'left' | 'right') => void
   setMode: (mode: OrderMode, table?: string) => void
   addLine: (line: CartLine) => void
@@ -267,6 +312,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     : 0
   const total = Math.max(0, preWallet - walletDeduction)
 
+  const portalLogin = useCallback(
+    (portal: Portal, role: UserRole, token: string) =>
+      dispatch({ type: 'PORTAL_LOGIN', portal, role, token }),
+    [],
+  )
+  const portalLogout = useCallback(() => dispatch({ type: 'PORTAL_LOGOUT' }), [])
+  const selectPortal = useCallback(
+    (portal: Portal) => dispatch({ type: 'SELECT_PORTAL', portal }),
+    [],
+  )
   const navigate = useCallback(
     (view: View, direction: 'left' | 'right' = 'left') =>
       dispatch({ type: 'NAVIGATE', view, direction }),
@@ -314,6 +369,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value: StoreCtx = {
     state,
+    portalLogin,
+    portalLogout,
+    selectPortal,
     navigate,
     setMode,
     addLine,

@@ -23,6 +23,7 @@
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-ink-faint: var(--ink-faint);
+  --color-ink-soft: var(--ink-soft);
 
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
@@ -63,6 +64,7 @@
   --ink: oklch(0.265 0.025 56);
   --ink-muted: oklch(0.46 0.022 60);
   --ink-faint: oklch(0.62 0.018 62);
+  --ink-soft: oklch(0.52 0.020 62);
 
   /* Dusty rose */
   --rose: oklch(0.62 0.082 32);
@@ -119,6 +121,9 @@
     border-top: 1px solid var(--line-strong);
     border-bottom: 1px solid var(--line-strong);
     height: 3px;
+  }
+  .paper-card {
+    @apply bg-surface border border-line rounded-lg;
   }
   /* hide scrollbar for category strip / chip rows */
   .no-scrollbar {
